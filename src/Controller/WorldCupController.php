@@ -1,12 +1,9 @@
 <?php
-// src/Controller/WorldCupController.php
 namespace App\Controller;
 
 use App\Repository\WorldcupMatchRepository;
-use App\Repository\GroupeRepository;
-use App\Repository\EquipeRepository;
-use App\Repository\EditionRepository;
 use App\Repository\ParticiperRepository;
+use App\Repository\EditionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -19,13 +16,65 @@ class WorldCupController extends AbstractController
         ParticiperRepository $participerRepository,
         EditionRepository $editionRepository
     ): Response {
+        // ===== Mapping manuel code FIFA -> emoji drapeau =====
+        $fifaToEmoji = [
+            'MEX' => '🇲🇽',
+            'ECU' => '🇪🇨',
+            'JPN' => '🇯🇵',
+            'AUS' => '🇦🇺',
+            'USA' => '🇺🇸',
+            'NED' => '🇳🇱',
+            'ITA' => '🇮🇹',
+            'NZL' => '🇳🇿',
+            'ARG' => '🇦🇷',
+            'DEN' => '🇩🇰',
+            'PER' => '🇵🇪',
+            'CMR' => '🇨🇲',
+            'FRA' => '🇫🇷',
+            'ENG' => '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+            'SUI' => '🇨🇭',
+            'KOR' => '🇰🇷',
+            'BRA' => '🇧🇷',
+            'ESP' => '🇪🇸',
+            'CRO' => '🇭🇷',
+            'MAR' => '🇲🇦',
+            'BEL' => '🇧🇪',
+            'POR' => '🇵🇹',
+            'SEN' => '🇸🇳',
+            'CAN' => '🇨🇦',
+            'GER' => '🇩🇪',
+            'URU' => '🇺🇾',
+            'COL' => '🇨🇴',
+            'CIV' => '🇨🇮',
+            'POL' => '🇵🇱',
+            'SWE' => '🇸🇪',
+            'EGY' => '🇪🇬',
+            'KSA' => '🇸🇦',
+            'SRB' => '🇷🇸',
+            'NGA' => '🇳🇬',
+            'TUN' => '🇹🇳',
+            'IRN' => '🇮🇷',
+            'NOR' => '🇳🇴',
+            'ALG' => '🇩🇿',
+            'GHA' => '🇬🇭',
+            'QAT' => '🇶🇦',
+            'TUR' => '🇹🇷',
+            'AUT' => '🇦🇹',
+            'RSA' => '🇿🇦',
+            'ISL' => '🇮🇸',
+            'CHI' => '🇨🇱',
+            'CZE' => '🇨🇿',
+            'ROU' => '🇷🇴',
+            'CRC' => '🇨🇷',
+        ];
+
         // Récupérer l'édition actuelle
         $edition = $editionRepository->findOneBy(['annee' => 2026]);
         
         // Récupérer tous les matchs triés par date
         $matches = $worldcupMatchRepository->findBy([], ['dateHeure' => 'ASC']);
         
-        // Grouper les participations par match avec l'ordre DOMICILE puis EXTERIEUR
+        // Grouper les participations par match
         $matchesData = [];
         foreach ($matches as $match) {
             $participations = $participerRepository->findBy(
@@ -34,14 +83,19 @@ class WorldCupController extends AbstractController
             );
             
             if (count($participations) === 2) {
+                $domCode = $participations[0]->getEquipe()->getCodePays();
+                $extCode = $participations[1]->getEquipe()->getCodePays();
+
                 $matchesData[] = [
                     'match' => $match,
-                    'domicile' => $participations[0], // DOMICILE
-                    'exterieur' => $participations[1], // EXTERIEUR
+                    'domicile' => $participations[0],
+                    'domicileDrapeau' => $fifaToEmoji[$domCode] ?? '🏳️',
+                    'exterieur' => $participations[1],
+                    'exterieurDrapeau' => $fifaToEmoji[$extCode] ?? '🏳️',
                 ];
             }
         }
-        
+
         return $this->render('world_cup/index.html.twig', [
             'edition' => $edition,
             'matchesData' => $matchesData,

@@ -540,8 +540,8 @@
                             {# Équipe Domicile #}
                             <div class="team">
                                 <div class="team-flag">
-                                    {% if domicile.equipe.drapeau %}
-                                        {{ domicile.equipe.drapeau }}
+                                    {% if data.domicileDrapeau %}
+                                        {{ data.domicileDrapeau }}
                                     {% else %}
                                         🏴
                                     {% endif %}
@@ -566,8 +566,8 @@
                             {# Équipe Extérieur #}
                             <div class="team away">
                                 <div class="team-flag">
-                                    {% if exterieur.equipe.drapeau %}
-                                        {{ exterieur.equipe.drapeau }}
+                                    {% if data.exterieurDrapeau %}
+                                        {{ data.exterieurDrapeau }}
                                     {% else %}
                                         🏴
                                     {% endif %}
@@ -627,8 +627,8 @@
                         <div class="upcoming-teams">
                             <div class="upcoming-team">
                                 <span class="upcoming-flag">
-                                    {% if data.domicile.equipe.drapeau %}
-                                        {{ data.domicile.equipe.drapeau }}
+                                    {% if data.domicileDrapeau %}
+                                        {{ data.domicileDrapeau }}
                                     {% else %}
                                         🏴
                                     {% endif %}
@@ -639,8 +639,8 @@
                             <div class="upcoming-team">
                                 <span>{{ data.exterieur.equipe.nomEquipe }}</span>
                                 <span class="upcoming-flag">
-                                    {% if data.exterieur.equipe.drapeau %}
-                                        {{ data.exterieur.equipe.drapeau }}
+                                    {% if data.exterieurDrapeau %}
+                                        {{ data.exterieurDrapeau }}
                                     {% else %}
                                         🏴
                                     {% endif %}
