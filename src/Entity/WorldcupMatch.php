@@ -32,8 +32,8 @@ class WorldcupMatch
 
     #[ORM\ManyToMany(targetEntity: Equipe::class)]
     #[ORM\JoinTable(name: "Participer",
-        joinColumns: [new ORM\JoinColumn(name: "Id_Match", referencedColumnName: "Id_Match")],
-        inverseJoinColumns: [new ORM\JoinColumn(name: "Id_Equipe", referencedColumnName: "Id_Equipe")]
+        joinColumns: [new ORM\JoinColumn(name: "id_match", referencedColumnName: "id_match")],
+        inverseJoinColumns: [new ORM\JoinColumn(name: "id_equipe", referencedColumnName: "id_equipe")]
     )]
     private $equipes;
     #[ORM\OneToMany(mappedBy: "match", targetEntity: Participer::class, cascade: ["persist", "remove"])]
