@@ -5,150 +5,33 @@
 {% block stylesheets %}
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0f1419; color: #ffffff; }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #0f1419;
-            color: #ffffff;
-        }
+        .header { background: linear-gradient(180deg, #1a1f2e 0%, #141923 100%); border-bottom: 1px solid #2a3441; position: sticky; top: 0; z-index: 100; }
+        .header-container { max-width: 1440px; margin: 0 auto; padding: 0 48px; display: flex; justify-content: space-between; align-items: center; height: 80px; }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo-text { font-family: 'Bebas Neue', cursive; font-size: 28px; letter-spacing: 1.5px; background: linear-gradient(135deg, #00ff87 0%, #60efff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* HEADER */
-        .header {
-            background: linear-gradient(180deg, #1a1f2e 0%, #141923 100%);
-            border-bottom: 1px solid #2a3441;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+        .nav { display: flex; gap: 40px; }
+        .nav-item { color: #8899a6; text-decoration: none; font-weight: 600; font-size: 15px; transition: color 0.3s; position: relative; }
+        .nav-item:hover { color: #ffffff; }
+        .nav-item.active { color: #00ff87; }
+        .nav-item.active::after { content: ''; position: absolute; bottom: -28px; left: 0; right: 0; height: 3px; background: #00ff87; }
 
-        .header-container {
-            max-width: 1440px;
-            margin: 0 auto;
-            padding: 0 48px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 80px;
-        }
+        .container { max-width: 1440px; margin: 0 auto; padding: 32px 48px; }
+        .layout { display: grid; grid-template-columns: 1fr 380px; gap: 32px; }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .page-header { margin-bottom: 40px; }
+        .page-title { font-family: 'Bebas Neue', cursive; font-size: 48px; letter-spacing: 2px; margin-bottom: 8px; }
+        .page-subtitle { color: #8899a6; font-size: 16px; }
 
-        .logo-text {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 28px;
-            letter-spacing: 1.5px;
-            background: linear-gradient(135deg, #00ff87 0%, #60efff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .tabs { display: flex; gap: 8px; margin-bottom: 32px; border-bottom: 1px solid #2a3441; padding-bottom: 16px; flex-wrap: wrap; }
+        .tab { padding: 12px 24px; border-radius: 8px; background: transparent; border: none; color: #8899a6; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.3s; text-decoration: none; }
+        .tab:hover { background: #1a1f2e; color: #ffffff; }
+        .tab.active { background: #00ff87; color: #0f1419; }
 
-        .nav {
-            display: flex;
-            gap: 40px;
-        }
-
-        .nav-item {
-            color: #8899a6;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 15px;
-            transition: color 0.3s;
-            position: relative;
-        }
-
-        .nav-item:hover {
-            color: #ffffff;
-        }
-
-        .nav-item.active {
-            color: #00ff87;
-        }
-
-        .nav-item.active::after {
-            content: '';
-            position: absolute;
-            bottom: -28px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: #00ff87;
-        }
-
-        /* CONTAINER */
-        .container {
-            max-width: 1440px;
-            margin: 0 auto;
-            padding: 32px 48px;
-        }
-
-        .layout {
-            display: grid;
-            grid-template-columns: 1fr 380px;
-            gap: 32px;
-        }
-
-        /* PAGE HEADER */
-        .page-header {
-            margin-bottom: 40px;
-        }
-
-        .page-title {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 48px;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-        }
-
-        .page-subtitle {
-            color: #8899a6;
-            font-size: 16px;
-        }
-
-        /* TABS */
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 32px;
-            border-bottom: 1px solid #2a3441;
-            padding-bottom: 16px;
-        }
-
-        .tab {
-            padding: 12px 24px;
-            border-radius: 8px;
-            background: transparent;
-            border: none;
-            color: #8899a6;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .tab:hover {
-            background: #1a1f2e;
-            color: #ffffff;
-        }
-
-        .tab.active {
-            background: #00ff87;
-            color: #0f1419;
-        }
-
-        /* MATCH CARDS */
-        .matches-grid {
-            display: grid;
-            gap: 20px;
-        }
+        .matches-grid { display: grid; gap: 20px; }
 
         .match-card {
             background: linear-gradient(135deg, #1a1f2e 0%, #141923 100%);
@@ -157,307 +40,54 @@
             border: 1px solid #2a3441;
             transition: all 0.3s;
             cursor: pointer;
+            display: block;
+            text-decoration: none;
+            color: inherit;
         }
+        .match-card:hover { border-color: #00ff87; transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0, 255, 135, 0.1); }
 
-        .match-card:hover {
-            border-color: #00ff87;
-            transform: translateY(-4px);
-            box-shadow: 0 8px 32px rgba(0, 255, 135, 0.1);
-        }
+        .match-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .match-info { display: flex; gap: 16px; align-items: center; }
+        .match-phase { background: #2a3441; color: #8899a6; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .match-time { color: #8899a6; font-size: 14px; font-weight: 600; }
 
-        .match-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+        .match-status { padding: 6px 16px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-live { background: linear-gradient(135deg, #00ff87 0%, #00d980 100%); color: #0f1419; animation: pulse 2s infinite; }
+        .status-finished { background: #2a3441; color: #60efff; }
+        .status-scheduled { background: #2a3441; color: #8899a6; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
 
-        .match-info {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
+        .teams-container { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 24px; margin-bottom: 20px; }
+        .team { display: flex; align-items: center; gap: 16px; }
+        .team.away { flex-direction: row-reverse; text-align: right; }
+        .team-flag { font-size: 48px; line-height: 1; }
+        .team-name { font-size: 20px; font-weight: 700; color: #ffffff; margin-bottom: 4px; }
+        .team-code { font-size: 13px; color: #8899a6; font-weight: 600; }
 
-        .match-phase {
-            background: #2a3441;
-            color: #8899a6;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
+        .score-container { display: flex; align-items: center; justify-content: center; gap: 16px; min-width: 120px; }
+        .score { font-family: 'Bebas Neue', cursive; font-size: 48px; color: #00ff87; line-height: 1; }
+        .score-separator { font-size: 32px; color: #2a3441; font-weight: 700; }
+        .vs { font-family: 'Bebas Neue', cursive; font-size: 28px; color: #2a3441; letter-spacing: 2px; }
 
-        .match-time {
-            color: #8899a6;
-            font-size: 14px;
-            font-weight: 600;
-        }
+        .match-stats { display: flex; gap: 24px; padding-top: 16px; border-top: 1px solid #2a3441; flex-wrap: wrap; }
+        .stat-item { display: flex; align-items: center; gap: 8px; color: #8899a6; font-size: 13px; }
+        .stat-icon { font-size: 16px; }
 
-        .match-status {
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .sidebar { position: sticky; top: 112px; height: fit-content; }
+        .sidebar-title { font-family: 'Bebas Neue', cursive; font-size: 20px; letter-spacing: 1.5px; color: #00ff87; margin-bottom: 16px; }
 
-        .status-live {
-            background: linear-gradient(135deg, #00ff87 0%, #00d980 100%);
-            color: #0f1419;
-            animation: pulse 2s infinite;
-        }
+        .upcoming-match { background: linear-gradient(135deg, #1a1f2e 0%, #141923 100%); border-radius: 12px; padding: 16px; border: 1px solid #2a3441; margin-bottom: 12px; transition: all 0.3s; }
+        .upcoming-match:hover { border-color: #00ff87; }
+        .upcoming-match-time { font-size: 12px; color: #8899a6; font-weight: 600; margin-bottom: 8px; }
+        .upcoming-teams { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .upcoming-team { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; }
+        .upcoming-flag { font-size: 18px; }
 
-        .status-finished {
-            background: #2a3441;
-            color: #60efff;
-        }
+        .date-separator { display: flex; align-items: center; gap: 16px; margin: 32px 0 24px 0; }
+        .date-separator-text { font-family: 'Bebas Neue', cursive; font-size: 24px; color: #00ff87; letter-spacing: 1.5px; white-space: nowrap; }
+        .date-separator-line { flex: 1; height: 2px; background: linear-gradient(to right, rgba(0, 255, 135, 0.5), transparent); }
 
-        .status-scheduled {
-            background: #2a3441;
-            color: #8899a6;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        /* TEAMS */
-        .teams-container {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-            gap: 24px;
-            margin-bottom: 20px;
-        }
-
-        .team {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .team.away {
-            flex-direction: row-reverse;
-            text-align: right;
-        }
-
-        .team-flag {
-            font-size: 48px;
-            line-height: 1;
-        }
-
-        .team-name {
-            font-size: 20px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-
-        .team-code {
-            font-size: 13px;
-            color: #8899a6;
-            font-weight: 600;
-        }
-
-        /* SCORE */
-        .score-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            min-width: 120px;
-        }
-
-        .score {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 48px;
-            color: #00ff87;
-            line-height: 1;
-        }
-
-        .score-separator {
-            font-size: 32px;
-            color: #2a3441;
-            font-weight: 700;
-        }
-
-        .vs {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 28px;
-            color: #2a3441;
-            letter-spacing: 2px;
-        }
-
-        /* MATCH STATS */
-        .match-stats {
-            display: flex;
-            gap: 24px;
-            padding-top: 16px;
-            border-top: 1px solid #2a3441;
-        }
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #8899a6;
-            font-size: 13px;
-        }
-
-        .stat-icon {
-            font-size: 16px;
-        }
-
-        /* SIDEBAR */
-        .sidebar {
-            position: sticky;
-            top: 112px;
-            height: fit-content;
-        }
-
-        .sidebar-title {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 20px;
-            letter-spacing: 1.5px;
-            color: #00ff87;
-            margin-bottom: 16px;
-        }
-
-        .group-standings {
-            background: linear-gradient(135deg, #1a1f2e 0%, #141923 100%);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #2a3441;
-        }
-
-        .standings-table {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .standings-row {
-            display: grid;
-            grid-template-columns: 30px 1fr 40px 50px 50px;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 0;
-        }
-
-        .position {
-            font-weight: 700;
-            color: #00ff87;
-            font-size: 16px;
-        }
-
-        .standings-team {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .standings-flag {
-            font-size: 20px;
-        }
-
-        .standings-team-name {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: #8899a6;
-            text-transform: uppercase;
-        }
-
-        .stat {
-            font-size: 14px;
-            font-weight: 600;
-            color: #8899a6;
-            text-align: center;
-        }
-
-        .stat.points {
-            color: #00ff87;
-            font-weight: 800;
-        }
-
-        /* UPCOMING MATCHES */
-        .upcoming-match {
-            background: linear-gradient(135deg, #1a1f2e 0%, #141923 100%);
-            border-radius: 12px;
-            padding: 16px;
-            border: 1px solid #2a3441;
-            margin-bottom: 12px;
-            transition: all 0.3s;
-        }
-
-        .upcoming-match:hover {
-            border-color: #00ff87;
-        }
-
-        .upcoming-match-time {
-            font-size: 12px;
-            color: #8899a6;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .upcoming-teams {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-        }
-
-        .upcoming-team {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .upcoming-flag {
-            font-size: 18px;
-        }
-
-        /* DATE SEPARATOR */
-        .date-separator {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin: 32px 0 24px 0;
-        }
-
-        .date-separator-text {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 24px;
-            color: #00ff87;
-            letter-spacing: 1.5px;
-            white-space: nowrap;
-        }
-
-        .date-separator-line {
-            flex: 1;
-            height: 2px;
-            background: linear-gradient(to right, rgba(0, 255, 135, 0.5), transparent);
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 1200px) {
-            .layout {
-                grid-template-columns: 1fr;
-            }
-            .sidebar {
-                position: static;
-            }
-        }
+        @media (max-width: 1200px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; } }
     </style>
 {% endblock %}
 
@@ -469,9 +99,9 @@
             <span class="logo-text">WORLD CUP 2026</span>
         </div>
         <nav class="nav">
-            <a href="/" class="nav-item active">Accueil</a>
+            <a href="{{ path('app_home') }}" class="nav-item active">Accueil</a>
             <a href="/matches" class="nav-item">Matchs</a>
-            <a href="/groupes" class="nav-item">Groupes</a>
+            <a href="{{ path('app_groupes') }}" class="nav-item">Groupes</a>
             <a href="/equipes" class="nav-item">Équipes</a>
             <a href="/statistiques" class="nav-item">Statistiques</a>
         </nav>
@@ -482,16 +112,20 @@
     <div class="page-header">
         <h1 class="page-title">🏆 COUPE DU MONDE 2026</h1>
         <p class="page-subtitle">
-            📅 {{ edition.dateDebut|date('d F Y') }} - {{ edition.dateFin|date('d F Y') }} 
+            📅 {{ edition.dateDebut|date('d F Y') }} - {{ edition.dateFin|date('d F Y') }}
             • 📍 Canada • États-Unis • Mexique
         </p>
     </div>
 
+    {# TABS PHASES #}
     <div class="tabs">
-        <button class="tab active">Tous les matchs</button>
-        <button class="tab">En direct</button>
-        <button class="tab">À venir</button>
-        <button class="tab">Résultats</button>
+        <a class="tab {{ selectedPhase is null ? 'active' : '' }}" href="{{ path('app_home') }}">Tous</a>
+        {% for phase in phases %}
+            <a class="tab {{ selectedPhase and selectedPhase.id == phase.id ? 'active' : '' }}"
+               href="{{ path('app_home', { phase: phase.id }) }}">
+                {{ phase.libelle }}
+            </a>
+        {% endfor %}
     </div>
 
     <div class="layout">
@@ -503,8 +137,7 @@
                     {% set domicile = data.domicile %}
                     {% set exterieur = data.exterieur %}
                     {% set matchDate = match.dateHeure|date('Y-m-d') %}
-                    
-                    {# Date separator #}
+
                     {% if matchDate != currentDate %}
                         {% set currentDate = matchDate %}
                         <div class="date-separator">
@@ -515,19 +148,19 @@
                         </div>
                     {% endif %}
 
-                    {# Match card #}
-                    <div class="match-card">
+                    {# Match card cliquable #}
+                    <a class="match-card" href="{{ path('app_match_detail', { id: match.id }) }}">
                         <div class="match-header">
                             <div class="match-info">
                                 <div class="match-phase">{{ match.phase.libelle }}</div>
                                 <div class="match-time">{{ match.dateHeure|date('H:i') }}</div>
                             </div>
-                            <div class="match-status 
+                            <div class="match-status
                                 {% if match.statut == 'EN_COURS' %}status-live
                                 {% elseif match.statut == 'TERMINE' %}status-finished
                                 {% else %}status-scheduled{% endif %}">
                                 {% if match.statut == 'EN_COURS' %}
-                                    ● LIVE {% if match.minuteActuelle %}{{ match.minuteActuelle }}'{% endif %}
+                                    ● LIVE
                                 {% elseif match.statut == 'TERMINE' %}
                                     TERMINÉ
                                 {% else %}
@@ -537,7 +170,6 @@
                         </div>
 
                         <div class="teams-container">
-                            {# Équipe Domicile #}
                             <div class="team">
                                 <div class="team-flag">
                                     {% if data.domicileDrapeau %}
@@ -552,7 +184,6 @@
                                 </div>
                             </div>
 
-                            {# Score #}
                             <div class="score-container">
                                 {% if match.statut == 'A_VENIR' %}
                                     <div class="vs">VS</div>
@@ -563,7 +194,6 @@
                                 {% endif %}
                             </div>
 
-                            {# Équipe Extérieur #}
                             <div class="team away">
                                 <div class="team-flag">
                                     {% if data.exterieurDrapeau %}
@@ -603,7 +233,7 @@
                                 </div>
                             {% endif %}
                         </div>
-                    </div>
+                    </a>
                 {% else %}
                     <div style="text-align: center; padding: 64px 0; color: #8899a6;">
                         <div style="font-size: 64px; margin-bottom: 16px;">⚽</div>
@@ -615,7 +245,7 @@
 
         <aside class="sidebar">
             <h2 class="sidebar-title">PROCHAINS MATCHS</h2>
-            
+
             {% set upcomingCount = 0 %}
             {% for data in matchesData %}
                 {% if data.match.statut == 'A_VENIR' and upcomingCount < 5 %}
@@ -652,7 +282,7 @@
             {% endfor %}
 
             <h2 class="sidebar-title" style="margin-top: 32px;">STATISTIQUES</h2>
-            <div class="group-standings">
+            <div class="upcoming-match" style="cursor: default;">
                 <div style="text-align: center; color: #8899a6; padding: 20px;">
                     <div style="font-size: 32px; margin-bottom: 8px;">📊</div>
                     <p style="font-size: 14px;">Classements disponibles<br>après le début de la compétition</p>
