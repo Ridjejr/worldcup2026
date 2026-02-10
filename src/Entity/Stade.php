@@ -26,14 +26,56 @@ class Stade
     #[ORM\Column(type: "integer")]
     private ?int $capacite = null;
 
-    // Getters et Setters
-    public function getId(): ?int { return $this->id; }
-    public function getNom(): ?string { return $this->nom; }
-    public function setNom(string $nom): self { $this->nom = $nom; return $this; }
-    public function getVille(): ?string { return $this->ville; }
-    public function setVille(string $ville): self { $this->ville = $ville; return $this; }
-    public function getPays(): ?string { return $this->pays; }
-    public function setPays(string $pays): self { $this->pays = $pays; return $this; }
-    public function getCapacite(): ?int { return $this->capacite; }
-    public function setCapacite(int $capacite): self { $this->capacite = $capacite; return $this; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): static
+    {
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getVille(): ?string
+    {
+        return $this->ville;
+    }
+
+    public function setVille(string $ville): static
+    {
+        $this->ville = $ville;
+
+        return $this;
+    }
+
+    public function getPays(): ?string
+    {
+        return $this->pays;
+    }
+
+    public function setPays(string $pays): static
+    {
+        $this->pays = $pays;
+
+        return $this;
+    }
+
+    public function getCapacite(): ?int
+    {
+        return $this->capacite;
+    }
+
+    public function setCapacite(int $capacite): static
+    {
+        $this->capacite = $capacite;
+
+        return $this;
+    }
 }

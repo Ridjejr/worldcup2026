@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\EditionRepository;
 
@@ -14,8 +17,8 @@ class Edition
     #[ORM\Column(type: "integer", name: "Id_Edition")]
     private ?int $id = null;
 
-    #[ORM\Column(type: "date", name: "année")]
-    private ?\DateTimeInterface $annee = null;
+    #[ORM\Column(type: "integer", name: "annee")]
+    private ?int $annee = null;
 
     #[ORM\Column(type: "string", length: 50)]
     private ?string $nom = null;
@@ -31,16 +34,86 @@ class Edition
 
     public function __construct() { $this->phases = new \Doctrine\Common\Collections\ArrayCollection(); }
 
-    // Getters/Setters
-    public function getId(): ?int { return $this->id; }
-    public function getAnnee(): ?\DateTimeInterface { return $this->annee; }
-    public function setAnnee(\DateTimeInterface $annee): self { $this->annee = $annee; return $this; }
-    public function getNom(): ?string { return $this->nom; }
-    public function setNom(string $nom): self { $this->nom = $nom; return $this; }
-    public function getDateDebut(): ?\DateTimeInterface { return $this->dateDebut; }
-    public function setDateDebut(\DateTimeInterface $dateDebut): self { $this->dateDebut = $dateDebut; return $this; }
-    public function getDateFin(): ?\DateTimeInterface { return $this->dateFin; }
-    public function setDateFin(\DateTimeInterface $dateFin): self { $this->dateFin = $dateFin; return $this; }
-    public function getPhases() { return $this->phases; }
-    public function addPhase(Phase $phase): self { if(!$this->phases->contains($phase)) { $this->phases[] = $phase; $phase->setEdition($this); } return $this; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getAnnee(): ?int
+    {
+        return $this->annee;
+    }
+
+    public function setAnnee(int $annee): static
+    {
+        $this->annee = $annee;
+
+        return $this;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): static
+    {
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getDateDebut(): ?\DateTime
+    {
+        return $this->dateDebut;
+    }
+
+    public function setDateDebut(\DateTime $dateDebut): static
+    {
+        $this->dateDebut = $dateDebut;
+
+        return $this;
+    }
+
+    public function getDateFin(): ?\DateTime
+    {
+        return $this->dateFin;
+    }
+
+    public function setDateFin(\DateTime $dateFin): static
+    {
+        $this->dateFin = $dateFin;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Phase>
+     */
+    public function getPhases(): Collection
+    {
+        return $this->phases;
+    }
+
+    public function addPhase(Phase $phase): static
+    {
+        if (!$this->phases->contains($phase)) {
+            $this->phases->add($phase);
+            $phase->setEdition($this);
+        }
+
+        return $this;
+    }
+
+    public function removePhase(Phase $phase): static
+    {
+        if ($this->phases->removeElement($phase)) {
+            // set the owning side to null (unless already changed)
+            if ($phase->getEdition() === $this) {
+                $phase->setEdition(null);
+            }
+        }
+
+        return $this;
+    }
 }

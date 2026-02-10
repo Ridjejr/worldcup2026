@@ -9,9 +9,24 @@
 
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
+            <script src="https://cdn.tailwindcss.com"></script>
+            <script>
+                tailwind.config = {
+                    theme: {
+                        extend: {
+                            colors: {
+                                'liberty-blue': '#002B7F',
+                                'fiesta-red': '#CE1126',
+                                'grass-green': '#1F8F3E',
+                                'trophy-gold': '#FFD700',
+                            }
+                        }
+                    }
+                }
+            </script>
         {% endblock %}
     </head>
-    <body>
+    <body class="bg-[#0f1419] text-white">
         {% block body %}{% endblock %}
     </body>
 </html>
