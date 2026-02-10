@@ -38,6 +38,20 @@ class WorldcupMatch
     private $equipes;
     #[ORM\OneToMany(mappedBy: "match", targetEntity: Participer::class, cascade: ["persist", "remove"])]
     private $participations;
+
+    #[ORM\Column(type: "integer", nullable: true)]
+    private ?int $apiFixtureId = null;
+
+    public function getApiFixtureId(): ?int
+    {
+        return $this->apiFixtureId;
+    }
+
+    public function setApiFixtureId(?int $apiFixtureId): static
+    {
+        $this->apiFixtureId = $apiFixtureId;
+        return $this;
+    }
     public function __construct() { $this->equipes = new \Doctrine\Common\Collections\ArrayCollection();
             $this->participations = new \Doctrine\Common\Collections\ArrayCollection();
             }

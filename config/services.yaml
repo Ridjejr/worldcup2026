@@ -1,21 +1,22 @@
-# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
-
-parameters:
-    # API Football
-    apifootball.base_url: '%env(APIFOOTBALL_BASE_URL)%'
-    apifootball.key: '%env(APIFOOTBALL_KEY)%'
-
+# config/services.yaml
 services:
+    # Configuration par défaut
     _defaults:
-        autowire: true
-        autoconfigure: true
+        autowire: true      # Injecte automatiquement les dépendances
+        autoconfigure: true # Enregistre automatiquement vos services comme commandes, etc.
 
-    # Tous les services du dossier src/
+    # 1. On charge toutes les classes de src/
     App\:
         resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
 
-    # --- Service API Football ---
-    App\Service\ApiFootballClient:
+    # 2. Configuration spécifique pour NOTRE service
+    # On injecte la clé définie dans .env.local directement dans l'argument du constructeur
+    App\Service\FootballApiService:
         arguments:
-            $baseUrl: '%apifootball.base_url%'
-            $apiKey: '%apifootball.key%'
+            # Le nom '$rapidApiKey' DOIT être identique au nom de la variable 
+            # dans le __construct de FootballApiService.php
+            $rapidApiKey: '%env(FOOTBALL_API_KEY)%'

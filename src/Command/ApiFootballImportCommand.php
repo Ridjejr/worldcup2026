@@ -15,12 +15,13 @@ use App\Repository\GroupeRepository;
 use App\Repository\PhaseRepository;
 use App\Repository\StadeRepository;
 use App\Repository\WorldcupMatchRepository;
-use App\Service\ApiFootballClient;
+use App\Service\FootballApiService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:api-football:import',
@@ -29,7 +30,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ApiFootballImportCommand extends Command
 {
     public function __construct(
-        private ApiFootballClient $api,
+        private FootballApiService $api,
         private EntityManagerInterface $em,
         private EditionRepository $editionRepo,
         private PhaseRepository $phaseRepo,
@@ -43,15 +44,13 @@ class ApiFootballImportCommand extends Command
 
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $league = (int)($_ENV['APIFOOTBALL_LEAGUE_ID'] ?? 0);
-        $season = (int)($_ENV['APIFOOTBALL_SEASON'] ?? 0);
+        $io = new SymfonyStyle($input, $output);
+        
+        // Configuration via .env 
+        $league = (int)($_ENV['APIFOOTBALL_LEAGUE_ID'] ?? 39); 
+        $season = (int)($_ENV['APIFOOTBALL_SEASON'] ?? 2022);
 
-        if ($league <= 0 || $season <= 0) {
-            $output->writeln('<error>APIFOOTBALL_LEAGUE_ID / APIFOOTBALL_SEASON manquants dans .env.local</error>');
-            return Command::FAILURE;
-        }
-
-        // 1) Edition (2026)
+        // 1. Edition & Phase
         $edition = $this->editionRepo->findOneBy(['annee' => 2026]);
         if (!$edition) {
             $edition = new Edition();
@@ -62,146 +61,164 @@ class ApiFootballImportCommand extends Command
             $this->em->persist($edition);
         }
 
-        // 2) Phase "Import API" (pour commencer simple)
         $phase = $this->phaseRepo->findOneBy(['edition' => $edition, 'libelle' => 'Import API']);
         if (!$phase) {
             $phase = new Phase();
             $phase->setLibelle('Import API');
-            $phase->setOrdre(99);
+            $phase->setOrdre('99');
             $phase->setEdition($edition);
             $this->em->persist($phase);
         }
+        
+        // Groupe par défaut
+        $groupeDefault = $this->groupeRepo->findOneBy(['nomGroupe' => 'A', 'phase' => $phase]);
+        if (!$groupeDefault) {
+            $groupeDefault = new Groupe();
+            $groupeDefault->setNomGroupe('A');
+            $groupeDefault->setClassement('0');
+            $groupeDefault->setPhase($phase);
+            $this->em->persist($groupeDefault);
+        }
 
-        $output->writeln("📡 Appel API fixtures league=$league season=$season ...");
+        $this->em->flush(); 
+
+        $io->title("📡 Importation League $league - Saison $season");
+        
         $data = $this->api->getFixtures($league, $season);
 
         if (!isset($data['response']) || !is_array($data['response'])) {
-            $output->writeln('<error>Réponse API invalide</error>');
+            $io->error('Réponse API invalide ou vide.');
             return Command::FAILURE;
         }
 
-        $count = 0;
+        $io->progressStart(count($data['response']));
 
         foreach ($data['response'] as $row) {
-            $fixture = $row['fixture'] ?? null;
-            $teams = $row['teams'] ?? null;
-            $goals = $row['goals'] ?? null;
+            $fixture = $row['fixture'];
+            $teams = $row['teams'];
+            $goals = $row['goals'];
+            $apiFixtureId = $fixture['id'];
 
-            if (!$fixture || !$teams) continue;
-
-            // --- Stade ---
-            $venue = $fixture['venue'] ?? [];
+            // --- 1. Gestion Stade ---
+            $venue = $fixture['venue'];
             $stadeNom = $venue['name'] ?? 'Stade inconnu';
-            $stadeVille = $venue['city'] ?? 'Ville inconnue';
-            $stadePays = 'N/A';
-
-            $stade = $this->stadeRepo->findOneBy(['nom' => $stadeNom, 'ville' => $stadeVille]);
+            $stade = $this->stadeRepo->findOneBy(['nom' => $stadeNom]);
+            
             if (!$stade) {
                 $stade = new Stade();
                 $stade->setNom($stadeNom);
-                $stade->setVille($stadeVille);
-                $stade->setPays($stadePays);
+                $stade->setVille($venue['city'] ?? 'Inconnue');
+                $stade->setPays('N/A');
+                $stade->setCapacite(50000);
                 $this->em->persist($stade);
+                $this->em->flush(); // Flush immédiat pour éviter doublons stade
             }
 
-            // --- Equipes ---
-            $home = $teams['home'] ?? [];
-            $away = $teams['away'] ?? [];
+            // --- 2. Gestion Equipes ---
+            $homeCode = substr(strtoupper($teams['home']['name']), 0, 3);
+            $awayCode = substr(strtoupper($teams['away']['name']), 0, 3);
 
-            $homeName = $home['name'] ?? 'Home';
-            $awayName = $away['name'] ?? 'Away';
+            $equipeHome = $this->findOrCreateEquipe($teams['home']['name'], $homeCode, $groupeDefault);
+            $equipeAway = $this->findOrCreateEquipe($teams['away']['name'], $awayCode, $groupeDefault);
 
-            // code_pays : l’API n’a pas toujours un code FIFA => on met les 3 premières lettres
-            $homeCode = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $homeName), 0, 3));
-            $awayCode = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $awayName), 0, 3));
+            // --- 3. Gestion Match ---
+            $match = $this->matchRepo->findOneBy(['apiFixtureId' => $apiFixtureId]);
 
-            // Groupe par défaut (si standings pas importés)
-            $groupeDefault = $this->groupeRepo->findOneBy(['nomGroupe' => 'X', 'phase' => $phase]);
-            if (!$groupeDefault) {
-                $groupeDefault = new Groupe();
-                $groupeDefault->setNomGroupe('X');
-                $groupeDefault->setPhase($phase);
-                $this->em->persist($groupeDefault);
+            // Si pas trouvé par ID API, on essaie Date + Stade
+            if (!$match) {
+                $dateHeure = new \DateTime($fixture['date']);
+                $match = $this->matchRepo->findOneBy([
+                    'dateHeure' => $dateHeure,
+                    'stade' => $stade
+                ]);
             }
 
-            $equipeHome = $this->equipeRepo->findOneBy(['codePays' => $homeCode]);
-            if (!$equipeHome) {
-                $equipeHome = new Equipe();
-                $equipeHome->setNomEquipe($homeName);
-                $equipeHome->setCodePays($homeCode);
-                $equipeHome->setGroupe($groupeDefault);
-                $this->em->persist($equipeHome);
+            if (!$match) {
+                $match = new WorldcupMatch();
+                $match->setPhase($phase);
             }
 
-            $equipeAway = $this->equipeRepo->findOneBy(['codePays' => $awayCode]);
-            if (!$equipeAway) {
-                $equipeAway = new Equipe();
-                $equipeAway->setNomEquipe($awayName);
-                $equipeAway->setCodePays($awayCode);
-                $equipeAway->setGroupe($groupeDefault);
-                $this->em->persist($equipeAway);
-            }
-
-            // --- Match ---
-            $dateIso = $fixture['date'] ?? null;
-            if (!$dateIso) continue;
-
-            $dateHeure = new \DateTime($dateIso);
-
-            // éviter doublons : même date + mêmes équipes
-            $existing = $this->matchRepo->findOneBy([
-                'dateHeure' => $dateHeure,
-                'phase' => $phase,
-                'stade' => $stade,
-            ]);
-
-            if ($existing) {
-                continue;
-            }
-
-            $match = new WorldcupMatch();
-            $match->setDateHeure($dateHeure);
-            $match->setPhase($phase);
+            $match->setApiFixtureId($apiFixtureId);
+            $match->setDateHeure(new \DateTime($fixture['date']));
             $match->setStade($stade);
-
-            // statut
-            $status = $fixture['status']['short'] ?? 'NS'; // NS, 1H, 2H, FT...
-            $statut = 'A_VENIR';
-            if (in_array($status, ['1H','2H','HT','ET','BT','P','LIVE'])) $statut = 'EN_COURS';
-            if (in_array($status, ['FT','AET','PEN'])) $statut = 'TERMINE';
-            $match->setStatut($statut);
+            
+            // Statut
+            $shortStatus = $fixture['status']['short'];
+            if (in_array($shortStatus, ['FT', 'AET', 'PEN'])) {
+                $match->setStatut('TERMINE');
+            } elseif (in_array($shortStatus, ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'])) {
+                $match->setStatut('EN_COURS');
+            } else {
+                $match->setStatut('A_VENIR');
+            }
 
             $this->em->persist($match);
 
-            // --- Participer domicile / extérieur ---
-            $pHome = new Participer();
-            $pHome->setMatch($match);
-            $pHome->setEquipe($equipeHome);
-            $pHome->setRole('DOMICILE');
-            $pHome->setProlongation(false);
-            $pHome->setButs($goals['home'] ?? null);
-            $this->em->persist($pHome);
+            // --- 4. Gestion Participations (CORRECTION ICI) ---
+            // On utilise une méthode sécurisée qui vérifie si la liaison existe déjà
+            $this->updateOrCreateParticipation($match, $equipeHome, 'DOMICILE', $goals['home']);
+            $this->updateOrCreateParticipation($match, $equipeAway, 'EXTERIEUR', $goals['away']);
 
-            $pAway = new Participer();
-            $pAway->setMatch($match);
-            $pAway->setEquipe($equipeAway);
-            $pAway->setRole('EXTERIEUR');
-            $pAway->setProlongation(false);
-            $pAway->setButs($goals['away'] ?? null);
-            $this->em->persist($pAway);
-
-            $count++;
-
-            if ($count % 50 === 0) {
-                $this->em->flush();
-                $this->em->clear();
-                $output->writeln("✅ $count matchs importés...");
-            }
+            $io->progressAdvance();
         }
 
         $this->em->flush();
+        $io->progressFinish();
+        $io->success('Import terminé avec succès !');
 
-        $output->writeln("✅ Import terminé : $count matchs importés.");
         return Command::SUCCESS;
+    }
+
+    private function findOrCreateEquipe(string $nom, string $code, Groupe $groupe): Equipe
+    {
+        $equipe = $this->equipeRepo->findOneBy(['nomEquipe' => $nom]);
+        if (!$equipe) {
+             $equipe = $this->equipeRepo->findOneBy(['codePays' => $code]);
+        }
+
+        if (!$equipe) {
+            $equipe = new Equipe();
+            $equipe->setNomEquipe($nom);
+            $equipe->setCodePays($code);
+            $equipe->setGroupe($groupe);
+            $this->em->persist($equipe);
+            $this->em->flush();
+        }
+
+        return $equipe;
+    }
+
+    // --- NOUVELLE MÉTHODE SÉCURISÉE ---
+    private function updateOrCreateParticipation(WorldcupMatch $match, Equipe $equipe, string $role, ?int $buts): void
+    {
+        // 1. On cherche si cette équipe participe DÉJÀ à ce match
+        // (On utilise la collection Doctrine pour éviter une requête SQL si c'est déjà chargé)
+        $existingParticipation = null;
+        
+        foreach ($match->getParticipations() as $p) {
+            // Si l'ID de l'équipe correspond, c'est qu'elle est déjà là
+            if ($p->getEquipe()->getId() === $equipe->getId()) {
+                $existingParticipation = $p;
+                break;
+            }
+        }
+
+        if ($existingParticipation) {
+            // MISE A JOUR
+            $existingParticipation->setRole($role);
+            $existingParticipation->setButs($buts);
+        } else {
+            // CRÉATION (seulement si n'existe pas)
+            $participation = new Participer();
+            $participation->setMatch($match);
+            $participation->setEquipe($equipe);
+            $participation->setRole($role);
+            $participation->setButs($buts);
+            $participation->setProlongation(false);
+            $this->em->persist($participation);
+            
+            // Important: ajouter à la collection du match en mémoire pour les prochains checks
+            $match->addParticipation($participation);
+        }
     }
 }

@@ -291,4 +291,19 @@
         </aside>
     </div>
 </div>
+{% block javascripts %}
+    <script>
+        // Si le match est en direct
+        document.addEventListener('DOMContentLoaded', function() {
+            const liveBadge = document.querySelector('.status-live');
+            
+            if (liveBadge) {
+                console.log("Match en direct : rafraîchissement...");
+                setTimeout(function(){
+                    window.location.reload();
+                }, 7000); // 7000ms = 7 secondes
+            }
+        });
+    </script>
+{% endblock %}
 {% endblock %}
