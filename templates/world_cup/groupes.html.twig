@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Coupe du Monde 2026 - Groupes{% endblock %}
+
+{% block stylesheets %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0f1419; color: #ffffff; }
+
+        .header { background: linear-gradient(180deg, #1a1f2e 0%, #141923 100%); border-bottom: 1px solid #2a3441; position: sticky; top: 0; z-index: 100; }
+        .header-container { max-width: 1440px; margin: 0 auto; padding: 0 48px; display: flex; justify-content: space-between; align-items: center; height: 80px; }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo-text { font-family: 'Bebas Neue', cursive; font-size: 28px; letter-spacing: 1.5px; background: linear-gradient(135deg, #00ff87 0%, #60efff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav { display: flex; gap: 40px; }
+        .nav-item { color: #8899a6; text-decoration: none; font-weight: 600; font-size: 15px; transition: color 0.3s; position: relative; }
+        .nav-item:hover { color: #ffffff; }
+        .nav-item.active { color: #00ff87; }
+        .nav-item.active::after { content: ''; position: absolute; bottom: -28px; left: 0; right: 0; height: 3px; background: #00ff87; }
+
+        .container { max-width: 1440px; margin: 0 auto; padding: 32px 48px; }
+
+        .page-header { margin-bottom: 32px; }
+        .page-title { font-family: 'Bebas Neue', cursive; font-size: 48px; letter-spacing: 2px; margin-bottom: 8px; }
+        .page-subtitle { color: #8899a6; font-size: 16px; }
+
+        .matches-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+
+        .match-card {
+            background: linear-gradient(135deg, #1a1f2e 0%, #141923 100%);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #2a3441;
+        }
+
+        .match-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .match-phase { background: #2a3441; color: #8899a6; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+
+        .team-row { display:flex; align-items:center; justify-content:space-between; padding: 10px 0; border-top: 1px solid rgba(42,52,65,0.6); }
+        .team-left { display:flex; align-items:center; gap:12px; }
+        .team-flag { font-size: 24px; line-height: 1; }
+        .team-name { font-weight: 700; }
+        .team-code { color:#8899a6; font-size: 13px; font-weight: 600; }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="header">
+    <div class="header-container">
+        <div class="logo">
+            <span style="font-size: 32px;">⚽</span>
+            <span class="logo-text">WORLD CUP 2026</span>
+        </div>
+        <nav class="nav">
+            <a href="{{ path('app_home') }}" class="nav-item">Accueil</a>
+            <a href="/matches" class="nav-item">Matchs</a>
+            <a href="{{ path('app_groupes') }}" class="nav-item active">Groupes</a>
+            <a href="/equipes" class="nav-item">Équipes</a>
+            <a href="/statistiques" class="nav-item">Statistiques</a>
+        </nav>
+    </div>
+</div>
+
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">👥 GROUPES</h1>
+        <p class="page-subtitle">Tous les groupes et les équipes</p>
+    </div>
+
+    <div class="matches-grid">
+        {% for groupe in groupes %}
+            <div class="match-card">
+                <div class="match-header">
+                    <div class="match-phase">GROUPE {{ groupe.nomGroupe }}</div>
+                </div>
+
+                {% for equipe in groupe.equipes %}
+                    <div class="team-row">
+                        <div class="team-left">
+                            <div class="team-flag">{{ equipe.drapeau ?: '🏴' }}</div>
+                            <div>
+                                <div class="team-name">{{ equipe.nomEquipe }}</div>
+                                <div class="team-code">{{ equipe.codePays }}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align:center; padding:64px 0; color:#8899a6;">
+                Aucun groupe disponible.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
