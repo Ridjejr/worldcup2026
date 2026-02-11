@@ -30,31 +30,96 @@ class WorldcupMatch
     #[ORM\JoinColumn(name: "Id_Phase", referencedColumnName: "Id_Phase", nullable: false)]
     private ?Phase $phase = null;
 
-    #[ORM\ManyToMany(targetEntity: Equipe::class)]
+    // 🔥 CORRECTION ICI : AJOUTÉ inversedBy: "matches"
+    #[ORM\ManyToMany(targetEntity: Equipe::class, inversedBy: "matches")]
     #[ORM\JoinTable(name: "Participer",
         joinColumns: [new ORM\JoinColumn(name: "id_match", referencedColumnName: "id_match")],
         inverseJoinColumns: [new ORM\JoinColumn(name: "id_equipe", referencedColumnName: "id_equipe")]
     )]
-    private $equipes;
+    private Collection $equipes;
+
     #[ORM\OneToMany(mappedBy: "match", targetEntity: Participer::class, cascade: ["persist", "remove"])]
-    private $participations;
+    private Collection $participations;
 
     #[ORM\Column(type: "integer", nullable: true)]
     private ?int $apiFixtureId = null;
 
-    public function getApiFixtureId(): ?int
+    public function __construct()
     {
-        return $this->apiFixtureId;
+        $this->equipes = new ArrayCollection();
+        $this->participations = new ArrayCollection();
     }
 
-    public function setApiFixtureId(?int $apiFixtureId): static
+    public function getId(): ?int
     {
-        $this->apiFixtureId = $apiFixtureId;
+        return $this->id;
+    }
+
+    public function getDateHeure(): ?\DateTime
+    {
+        return $this->dateHeure;
+    }
+
+    public function setDateHeure(\DateTime $dateHeure): static
+    {
+        $this->dateHeure = $dateHeure;
         return $this;
     }
-    public function __construct() { $this->equipes = new \Doctrine\Common\Collections\ArrayCollection();
-            $this->participations = new \Doctrine\Common\Collections\ArrayCollection();
-            }
+
+    public function getStatut(): ?string
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(string $statut): static
+    {
+        $this->statut = $statut;
+        return $this;
+    }
+
+    public function getStade(): ?Stade
+    {
+        return $this->stade;
+    }
+
+    public function setStade(?Stade $stade): static
+    {
+        $this->stade = $stade;
+        return $this;
+    }
+
+    public function getPhase(): ?Phase
+    {
+        return $this->phase;
+    }
+
+    public function setPhase(?Phase $phase): static
+    {
+        $this->phase = $phase;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Equipe>
+     */
+    public function getEquipes(): Collection
+    {
+        return $this->equipes;
+    }
+
+    public function addEquipe(Equipe $equipe): static
+    {
+        if (!$this->equipes->contains($equipe)) {
+            $this->equipes->add($equipe);
+        }
+        return $this;
+    }
+
+    public function removeEquipe(Equipe $equipe): static
+    {
+        $this->equipes->removeElement($equipe);
+        return $this;
+    }
 
     /**
      * @return Collection<int, Participer>
@@ -70,96 +135,27 @@ class WorldcupMatch
             $this->participations->add($participation);
             $participation->setMatch($this);
         }
-
         return $this;
     }
 
-            public function getId(): ?int
-            {
-                return $this->id;
+    public function removeParticipation(Participer $participation): static
+    {
+        if ($this->participations->removeElement($participation)) {
+            if ($participation->getMatch() === $this) {
+                $participation->setMatch(null);
             }
+        }
+        return $this;
+    }
 
-            public function getDateHeure(): ?\DateTime
-            {
-                return $this->dateHeure;
-            }
+    public function getApiFixtureId(): ?int
+    {
+        return $this->apiFixtureId;
+    }
 
-            public function setDateHeure(\DateTime $dateHeure): static
-            {
-                $this->dateHeure = $dateHeure;
-
-                return $this;
-            }
-
-            public function getStatut(): ?string
-            {
-                return $this->statut;
-            }
-
-            public function setStatut(string $statut): static
-            {
-                $this->statut = $statut;
-
-                return $this;
-            }
-
-            public function getStade(): ?Stade
-            {
-                return $this->stade;
-            }
-
-            public function setStade(?Stade $stade): static
-            {
-                $this->stade = $stade;
-
-                return $this;
-            }
-
-            public function getPhase(): ?Phase
-            {
-                return $this->phase;
-            }
-
-            public function setPhase(?Phase $phase): static
-            {
-                $this->phase = $phase;
-
-                return $this;
-            }
-
-            /**
-             * @return Collection<int, Equipe>
-             */
-            public function getEquipes(): Collection
-            {
-                return $this->equipes;
-            }
-
-            public function addEquipe(Equipe $equipe): static
-            {
-                if (!$this->equipes->contains($equipe)) {
-                    $this->equipes->add($equipe);
-                }
-
-                return $this;
-            }
-
-            public function removeEquipe(Equipe $equipe): static
-            {
-                $this->equipes->removeElement($equipe);
-
-                return $this;
-            }
-
-            public function removeParticipation(Participer $participation): static
-            {
-                if ($this->participations->removeElement($participation)) {
-                    // set the owning side to null (unless already changed)
-                    if ($participation->getMatch() === $this) {
-                        $participation->setMatch(null);
-                    }
-                }
-
-                return $this;
-            }
+    public function setApiFixtureId(?int $apiFixtureId): static
+    {
+        $this->apiFixtureId = $apiFixtureId;
+        return $this;
+    }
 }
