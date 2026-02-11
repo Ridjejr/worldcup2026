@@ -47,7 +47,7 @@ class ApiFootballImportCommand extends Command
         $io = new SymfonyStyle($input, $output);
         
         // Configuration via .env 
-        $league = (int)($_ENV['APIFOOTBALL_LEAGUE_ID'] ?? 39); 
+        $league = (int)($_ENV['APIFOOTBALL_LEAGUE_ID'] ?? 1); 
         $season = (int)($_ENV['APIFOOTBALL_SEASON'] ?? 2022);
 
         // 1. Edition & Phase

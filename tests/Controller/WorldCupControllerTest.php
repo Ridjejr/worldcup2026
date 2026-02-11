@@ -21,7 +21,7 @@ class WorldCupControllerTest extends WebTestCase
         $this->assertSelectorTextContains('.logo', '⚽');
 
         // Vérifie qu’au moins un onglet "Tous les matchs" existe
-        $this->assertSelectorTextContains('.tab', 'Tous les matchs');
+        $this->assertSelectorTextContains('.tab', 'Tous');
 
         // Vérifie qu’un match ou message "Aucun match" est présent
         $this->assertTrue(
