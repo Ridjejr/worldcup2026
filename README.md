@@ -14,25 +14,34 @@ Application de suivi de la Coupe du Monde 2026 (matchs, phases, groupes, détail
    ```bash
    git clone <repo-url>
    cd worldcup2026
+   
 Installer les dépendances :
 
-composer install
+    ```bash
+    composer install
 
 Configurer la base de données dans .env.local :
 
-DATABASE_URL="mysql://root:@127.0.0.1:3306/cdw2026?serverVersion=8.0.32&charset=utf8mb4"
-APIFOOTBALL_KEY=VOTRE_CLE_API
-APIFOOTBALL_LEAGUE_ID=1
-APIFOOTBALL_SEASON=2022
+    ``bash
+    DATABASE_URL="mysql://root:@127.0.0.1:3306/cdw2026?serverVersion=8.0.32&charset=utf8mb4"
+    APIFOOTBALL_KEY=VOTRE_CLE_API
+    APIFOOTBALL_LEAGUE_ID=1
+    APIFOOTBALL_SEASON=2022
 
 Créer la base + schéma :
 
-php bin/console doctrine:database:create
-php bin/console doctrine:schema:update --force
+    ``bash
+    php bin/console doctrine:database:create
+    php bin/console doctrine:schema:update --force
 
 Lancer le serveur :
 
-symfony server:star ou php -S 127.0.0.1:8000 -t public
+    ``bash
+    symfony server:star 
+    ou 
+    php -S 127.0.0.1:8000 -t public
 
 Import API
-php bin/console app:api-football:import
+
+    ``bash
+    php bin/console app:api-football:import
